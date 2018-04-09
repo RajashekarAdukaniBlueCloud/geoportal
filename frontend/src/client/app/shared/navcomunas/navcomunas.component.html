@@ -1,0 +1,21 @@
+<div class="nav" *ngIf="show" @fade #navcomuna>
+    <div class="mobile-btn" (click)="navcomuna.visible = !navcomuna.visible">
+        <i class="fa fa-search" *ngIf="!navcomuna.visible"></i>
+        <i class="fa fa-angle-down" *ngIf="navcomuna.visible"></i>
+    </div>
+    <div class="buscador" [class.visible]="navcomuna.visible">
+        <input type="text" #search placeholder="Nombre Comuna" (keyup)="search_commune(search.value)"/>
+        <label><i class="fa fa-search icon"></i></label>
+    </div>
+    <div class="container" [class.visible]="navcomuna.visible" (mouseleave)="finishCommune()">
+        <div 
+            class="item"
+            *ngFor="let commune of communes_showcase"
+            (click)="click_commune(commune)"
+            (mouseover)="over_commune(commune)"
+            (mouseout)="out_commune(commune)"
+        >
+            {{ commune.Name | grammarchecker | capitalize }}
+        </div>
+    </div>
+</div>

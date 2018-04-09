@@ -1,0 +1,15 @@
+<div class="screen">
+  <div class="band">
+    <div class="logo"></div>
+    <div class="geoportal">
+      <div class="circle"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+      <div class="title">GEO PORTAL</div>
+    </div>
+  </div>
+  <div class="layers">
+    <div class="layer" *ngFor="let group of groups">
+      <div class="title">{{ group.name }}</div>
+      <div class="icon" [innerHtml]="group.icon" (click)="change(group)"></div>
+    </div>
+  </div>
+</div>

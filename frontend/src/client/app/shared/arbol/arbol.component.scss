@@ -1,0 +1,142 @@
+.changer{
+	position:fixed;
+	left:0px;
+	top: 0px;
+	width:270px;
+	background:#FFF;
+	border: 1px solid #CCC;
+	color: #6F81A1;
+	-webkit-box-shadow: 0px 0px 5px 0px rgba(112,108,112,1);
+	-moz-box-shadow: 0px 0px 5px 0px rgba(112,108,112,1);
+	box-shadow: 0px 0px 5px 0px rgba(112,108,112,1);
+	border-bottom-right-radius: 7px;
+	overflow:hidden;
+	@media (max-width: 1280px ) { 
+		width: 230px;
+	}
+	/*MOVIL*/
+	@media (max-width: 420px ) { 
+		width: 100%;
+	}
+	.header{
+		margin-top:25px;
+		margin-left:10px;
+		height:110px;
+		font-size: 0.9rem;
+		padding:10px;
+		background-image: url('assets/img/logo.svg');
+		background-size: 230px;
+		background-repeat: no-repeat;
+		@media (max-width: 1280px ) { 
+			background-size: 200px;
+		}
+		/*MOVIL*/
+		@media (max-width: 420px ) { 
+			height: 45px;
+			background-size: 130px;
+			margin-top: 5px;
+			justify-content: flex-end;
+			display: flex;
+			.mobile_btn{
+				display: flex;
+				width: 30px;
+				justify-content: center;
+				i{
+					display: flex;
+				}
+			}
+		}
+		.mobile_btn {
+			display: none;
+			@media (max-width: 420px ) {
+				display: flex;
+			}
+		}
+	}
+	.mobilemenu{
+		display: block !important;
+		height: calc(100% - 45px);
+	}
+	.body{
+		/*MOVIL*/
+		@media (max-width: 420px ) { 
+			display: none;
+		}
+		.opcion{
+			display:flex;
+			flex-direction:column;
+			cursor:pointer;
+			.head{
+				display:flex;
+				flex-direction:row;
+				font-size:0.9rem;
+				padding-bottom:5px;
+				background:#E8ECFA;
+				padding:20px;
+				@media (max-width: 1280px ) { 
+					font-size:0.8rem;
+					align-content: center;
+					align-items: center;
+				}
+				.icon{
+					width:10%;
+					display:flex;
+					margin-right: 10px;
+					cursor:pointer;
+					align-items:center;
+					align-content:center;
+					font-size:1.5rem;
+				}
+				.title{
+					width:80%;
+					display:flex;
+					
+				}
+				.arrow{
+					width:10%;
+					display:flex;
+					right:0px;
+					align-items:center;
+					align-content:center;
+					font-size:1.5rem;
+				}
+			}
+			.body{
+				display:flex;
+				flex-direction:column;
+				.prop{
+					display:flex;
+					padding:10px 0px;
+					.item{
+						width:100%;
+						display:flex;
+						flex-direction:row;
+						align-items:center;
+						align-content:center;
+						font-size:1.1rem;
+						padding-left:35px;
+						@media (max-width: 1280px ) { 
+							font-size:0.9rem;
+							align-content: center;
+							align-items: center;
+						}
+						input{
+							display:flex;
+							margin-right:10px;
+							background: #67E300;
+						}
+						.label{
+							display:flex;
+							font-size:0.8em;
+						}
+					}
+				}
+				.checked{
+					/* Tengo la fe de que algún día esto volverá a ser lo que era */
+					/*border-right: 7px solid #67E300;*/
+					background-color: #E2F4D2;/*rgb(232,236,250);*/
+				}
+			}
+		}
+	}
+}

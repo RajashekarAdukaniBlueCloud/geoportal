@@ -1,0 +1,125 @@
+<sd-navcomunas
+	[communes]="view_communes"
+	[show]="!list_auditorias && view_communes.length > 0"
+	(setCommune)="setCommune($event)">
+</sd-navcomunas>
+<div class="leyenda" *ngIf="meta_data_regional && !meta_data_comunal" @fade>
+	<div class="head">Número de Informes</div>
+	<div class="body">
+		<div class="scale"></div>
+		<div class="fila">
+			<div class="top">+ {{ (auditoria.getMaxRegional()*0.7) | floor | pointReplacer }}</div>
+			<div class="middle">{{ (auditoria.getMaxRegional()*0.35)  | floor | pointReplacer }}</div>
+			<div class="bottom">0</div>
+		</div>
+	</div>
+</div>
+<div class="leyenda" *ngIf="meta_data_regional && meta_data_comunal && selected_regional && auditoria.getMaxComunal()" @fade>
+	<div class="head">Número de Informes</div>
+	<div class="body">
+		<div class="scale"></div>
+		<div class="fila">
+			<div class="top">+ {{ (auditoria.getMaxComunal()*0.7) | floor | pointReplacer}}</div>
+			<div class="middle">{{ (auditoria.getMaxComunal()*0.35)  | floor | pointReplacer }}</div>
+			<div class="bottom">0</div>
+		</div>
+	</div>
+</div>
+<!-- INFO BOARD -->
+<div class="info_board">
+	<sd-cuadrogeneral [name]="name" [date]="getDate()"></sd-cuadrogeneral>
+	<sd-cuadronacional 
+		[value]="((meta_data_regional)?auditoria.getTotalRegional():0) | pointReplacer" 
+		[leyend]="'Informes'"
+	></sd-cuadronacional>
+	<div class="regional" *ngIf="selected_regional" @move>
+		<div class="title">
+			<div class="text">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ auditoria.getTotalRegional(selected_regional.C_REG) | pointReplacer }}</div>
+			<div class="text">Informes</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ auditoria.getTotalRegional(selected_regional.C_REG)/auditoria.getTotalRegional()*100 | floor }}%</div>
+			<div class="text">Del total Nacional</div>
+		</div>
+		<div class="arrow"><i class="fa fa-chevron-right" aria-hidden="true"></i></div>
+	</div>
+	<div class="comunal" *ngIf="selected_regional && selected_comunal" [class.semaforo_box]="auditoria_view" @move>
+		<div class="arrow"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+		<div class="title">
+			<div class="text">{{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ (meta_data_comunal.COMUNAS[selected_comunal.CINE_COM])?meta_data_comunal.COMUNAS[selected_comunal.CINE_COM].TOTAL_INFORMES:0 | pointReplacer }}</div>
+			<div class="text">Informes</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ ((meta_data_comunal.COMUNAS[selected_comunal.CINE_COM])?meta_data_comunal.COMUNAS[selected_comunal.CINE_COM].TOTAL_INFORMES:0)/((auditoria.getTotalComunal()) ? auditoria.getTotalComunal() : 1)*100 | floor }}%</div>
+			<div class="text">Del total Regional</div>
+		</div>
+	</div>
+</div>
+<!-- ELEMENTOS DE LOS INFORMES -->
+<div class="informes" *ngIf="list_auditorias" @fade>
+	<div class="header">
+		<div class="title">
+			<div class="icon"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+			<div class="location">
+				<div class="region" *ngIf="selected_regional">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+				<div class="comuna" *ngIf="selected_comunal">Comuna de {{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+			</div>
+		</div>
+		<div class="data">
+			<div class="search">
+				<div class="buscador">
+					<label class="icon"><i class="fa fa-search" aria-hidden="true"></i></label>
+					<input type="text" placeholder="Buscar Informe..." #buscadortxt name="buscador" (keyup)="buscador(buscadortxt.value)"/>
+				</div>
+			</div>
+		</div>
+		<div class="cerrar"><i class="fa fa-times" aria-hidden="true" (click)="closeInformes()"></i></div>
+	</div>
+	<div class="body">
+		<div class="table_container">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>N° <i class="fa fa-caret-down" aria-hidden="true" (click)="filter(1)"></i></th>
+						<th width="80">Año <i class="fa fa-caret-down" aria-hidden="true" (click)="filter(2)"></i></th>
+						<th>Nombre <i class="fa fa-caret-down" aria-hidden="true" (click)="filter(3)"></i></th>
+						<th>Servicio <i class="fa fa-caret-down" aria-hidden="true" (click)="filter(4)"></i></th>
+						<th>Tipo <i class="fa fa-caret-down" aria-hidden="true" (click)="filter(5)"></i></th>
+						<th>Fecha <i class="fa fa-caret-down" aria-hidden="true" (click)="filter(6)"></i></th>
+						<th width="80">Ficha <i class="fa fa-caret-down" aria-hidden="true"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let auditoria of paginator_auditorias">
+						<td> {{ auditoria.IDINFORME }}</td>
+						<td> {{ auditoria.ANOINFORME }} </td>
+						<td class="overflow"> {{ auditoria.MATERIAINFORME }} </td>
+						<td> {{ auditoria.NOMBRESERVICIO | capitalize }} </td>
+						<td> {{ auditoria.TIPOINFORME }} </td>
+						<td> {{ auditoria.FECHAINFORME | date:'dd/MM/y' }} </td>
+						<td> <a [attr.href]="auditoria.FICHAINFORMEBIFA" target="_blank"><i class="fa fa-download" aria-hidden="true"></i></a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="footer">
+			<div class="resumen">Mostrando registros del {{ ((actual_page-1))*pagination_config+1 }} al {{ (actual_page*pagination_config < pool_auditorias.length)?actual_page*pagination_config:(pool_auditorias.length) }} de {{ pool_auditorias.length }}</div>
+			<div class="paginator">
+				<div class="arrow" (click)="paginator(((actual_page - 1) > 1) ? actual_page - 1 : 1)"><i class="fa fa-angle-double-left" aria-hidden="true"></i></div>
+				<div class="page" *ngFor="let page of pages" (click)="paginator(page)" [class.active]="page === actual_page">{{ page }}</div>
+				<div class="arrow" (click)="paginator(((actual_page + 1) < pages.length) ? actual_page + 1 : pages.length)"><i class="fa fa-angle-double-right" aria-hidden="true"></i></div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="control" *ngIf="!list_auditorias && poligonos_comunales.length > 0" (click)="backRegional()" @fade>
+	<div class="icon"><i class="fa fa-reply" aria-hidden="true"></i></div>
+	<div class="label">Vista Regional</div>
+</div>
+<div class="logo"></div>

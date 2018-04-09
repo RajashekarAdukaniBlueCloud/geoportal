@@ -1,0 +1,136 @@
+.blackscreen{
+	position: fixed;
+	display: none;
+	height: 100%;
+	width: 100%;
+	background: rgba(255,255,255,0.6);
+	z-index: 100;
+	top:0px;
+	left: 0px;
+	justify-content: center;
+  	align-items: center;
+	.blackscreen-content{
+		border: 1px solid #CCC;
+		display:flex;
+		background: #FFF;
+		height: 250px;
+		width: 500px;
+		z-index: 11;
+		flex-direction: column;
+		.body {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+
+			.spinner_cgr {
+				width: 100%;
+				height: 40px;
+				margin-top: 25px;
+				text-align: center;
+				font-size: 10px;
+	
+				div {
+					background-color: #333;
+					height: 25px;
+					width: 25px;
+					display: inline-block;
+					transform: rotate(45deg);
+					margin-right: 10px;
+					animation: sk-stretchdelay 2.4s infinite ease-in-out;
+					-webkit-animation: sk-stretchdelay 2.4s infinite ease-in-out; 
+				}
+	
+				.rect1 {
+					background-color: #ff302d;
+					-webkit-animation-delay: 0s;
+					animation-delay: 0s;
+				
+				}
+				
+				.rect2 {
+					 background-color: #2da2a4;
+					-webkit-animation-delay: 0.3s;
+					animation-delay: 0.3s;
+				}
+				
+				.rect3 {
+					background-color: #943497;
+					-webkit-animation-delay: 0.6s;
+					animation-delay: 0.6s;
+				}
+				
+				.rect4 {
+					background-color: #e1d71e;
+					-webkit-animation-delay: 0.9s;
+					animation-delay: 0.9s;
+				}
+				
+				.rect5 {
+					background-color: #e80d86;
+					-webkit-animation-delay: 1.2s;
+					animation-delay: 1.2s;
+				}
+				
+				.rect6 {
+					background-color: #66b92c;
+					-webkit-animation-delay: 1.5s;
+					animation-delay: 1.5s;
+				}
+				
+				.rect7 {
+					background-color: #bd0d1a;
+					-webkit-animation-delay: 1.8s;
+					animation-delay: 1.8s;
+				}
+				
+				.rect8 {
+					background-color: #005cb9;
+					-webkit-animation-delay: 2.1s;
+					animation-delay: 2.1s;
+				}
+				
+				@-webkit-keyframes sk-stretchdelay {
+					0%, 20%, 40%, 60% { 
+						-webkit-transform: scale(1) rotate(45deg);
+					}
+					20% {
+						-webkit-transform: scale(2) rotate(45deg);
+					}
+				}
+				
+				@keyframes sk-stretchdelay {
+					0%, 20%, 40%, 60% { 
+						transform: scale(1) rotate(45deg); 
+					}
+					20% { 
+						transform: scale(2) rotate(45deg); 
+					}
+				}
+			}
+
+			.logo_cont{
+				display:flex;
+				width:100%;
+				height:115px;
+				padding:10px;
+				justify-content:center;
+				flex-direction:row;
+				align-items:center;
+				align-content:center;
+				object {
+					height: 100%;
+				}
+			}
+
+			.message{
+				text-align: center;
+				font-size: 1rem;
+				padding-top: 10px
+			}
+		}
+	}
+}
+.displayed{
+	display: flex;
+}

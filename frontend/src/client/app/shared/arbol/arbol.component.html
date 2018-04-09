@@ -1,0 +1,49 @@
+<div class="changer" #arbol>
+	<div class="header">
+		<div class="mobile_btn" (click)="arbol.colapse = !arbol.colapse"><i class="fa fa-bars"></i></div>
+	</div>
+	<div class="body"> 
+		<div class="opcion" *ngFor="let group of groups">
+			<div class="head" (click)="group.active = !group.active">
+				<div class="icon">
+					<i [class]="group.icon" aria-hidden="true" ></i>
+				</div>
+				<div class="title">{{ group.name }}</div>
+				<div class="arrow">
+					<i class="fa fa-angle-up" aria-hidden="true"  *ngIf="group.active"></i>
+					<i class="fa fa-angle-down" aria-hidden="true" *ngIf="!group.active"></i>
+				</div>
+			</div>
+			<div class="body" *ngIf="group.active" @move>
+				<div class="prop" *ngFor="let layer of group.layers" [class.checked]="link===layer.link">
+					<div class="item" [class.checked]="link===layer.link" (click)="change(layer)">
+						<input type="radio" name="gender" value="auditoria" [checked]="link===layer.link">
+						<div class="label">{{ layer.name }}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="body mobilemenu" *ngIf="arbol.colapse" @drop> 
+		<div class="opcion" *ngFor="let group of groups">
+			<div class="head" (click)="group.active = !group.active">
+				<div class="icon">
+					<i [class]="group.icon" aria-hidden="true" ></i>
+				</div>
+				<div class="title">{{ group.name }}</div>
+				<div class="arrow">
+					<i class="fa fa-angle-up" aria-hidden="true" *ngIf="group.active"></i>
+					<i class="fa fa-angle-down" aria-hidden="true" *ngIf="!group.active"></i>
+				</div>
+			</div>
+			<div class="body" *ngIf="group.active" @move>
+				<div class="prop" *ngFor="let layer of group.layers" [class.checked]="link===layer.link">
+					<div class="item"  (click)="change(layer)">
+						<input type="radio" name="gender" value="auditoria" [checked]="link===layer.link">
+						<div class="label">{{ layer.name }}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

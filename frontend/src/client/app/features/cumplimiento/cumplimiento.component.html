@@ -1,0 +1,237 @@
+<sd-navcomunas
+	[communes]="view_communes"
+	[show]="!lock_status && view_communes.length > 0"
+	(setCommune)="setCommune($event)">
+</sd-navcomunas>
+<div class="leyenda_regional" *ngIf="!lock_status && leyenda=='nacional'" @fade>
+	<div class="head"><b>Cumplimiento Regional</b></div>
+	<div class="body">
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box top"></div>
+			</div>
+			<div class="info">
+				<div class="text">75% o más de los municipios en norma</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box middle"></div>
+			</div>
+			<div class="info">
+				<div class="text">Entre 50% y 75% de los municipios en norma</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box bottom"></div>
+			</div>
+			<div class="info">
+				<div class="text">Menos del 50% de los municipios en norma</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="leyenda_regional" *ngIf="!lock_status && leyenda=='regional'" @fade>
+	<div class="head"><b>Cumplimiento Municipal</b></div>
+	<div class="body">
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box top"></div>
+			</div>
+			<div class="info">
+				<div class="text">Todos los informes financieros enviados a Contraloría</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box middle"></div>
+			</div>
+			<div class="info">
+				<div class="text">Informes financieros parcialmente enviados a Contraloría</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box bottom"></div>
+			</div>
+			<div class="info">
+				<div class="text">Ningún informe financiero enviado a Contraloría</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="leyenda_comunal" *ngIf="leyenda=='comunal' && !reports" @fade>
+	<div class="head"><b>Estado de Informe Municipal</b></div>
+	<div class="body">
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box top"><i class="fa fa-check" aria-hidden="true"></i></div>
+			</div>
+			<div class="info">
+				<div class="text">Informe enviado a Contraloría</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box bottom"><i class="fa fa-times" aria-hidden="true"></i></div>
+			</div>
+			<div class="info">
+				<div class="text">Informe no enviado a Contraloría</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box"><i class="fa fa-minus" aria-hidden="true"></i></div>
+			</div>
+			<div class="info">
+				<div class="text">Informe no debe enviarse en el período</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="info_board">
+	<sd-cuadrogeneral [name]="name" [date]="date"></sd-cuadrogeneral>
+	<sd-cuadronacional 
+		[value]="(((cumplimiento_por_nacional.TOTAL > 0)?cumplimiento_por_nacional.CUMPLIDO / cumplimiento_por_nacional.TOTAL*100:0) | number:'1.0-0') + '%'"
+		[leyend]="'Porcentaje de Cumplimiento'"
+	></sd-cuadronacional>
+	<div class="regional" *ngIf="selected_regional" @move>
+		<div class="title">
+			<div class="text">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ (cumplimiento_regional[selected_regional.C_REG].CUMPLIDO / (cumplimiento_regional[selected_regional.C_REG].CUMPLIDO+cumplimiento_regional[selected_regional.C_REG].PARCIAL+cumplimiento_regional[selected_regional.C_REG].INCUMPLIDO)*100) | number:'1.0-0'}}%</div>
+			<div class="text">Porcentaje de Cumplimiento</div>
+		</div>
+		<div class="arrow"><i class="fa fa-chevron-right" aria-hidden="true"></i></div>
+	</div>
+	<div class="comunal" *ngIf="selected_regional && selected_comunal" [class.semaforo_box]="semaforo_view" @move>
+		<div class="arrow"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+		<div class="title">
+			<div class="text">{{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ (meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].CUMPLIDO/meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].TOTAL)*100 | number:'1.0-0'}}%</div>
+			<div class="text">Porcentaje de Cumplimiento anual</div>
+		</div>
+	</div>
+</div>
+<div class="semaforo" *ngIf="semaforo_view" @fade>
+	<div class="header">
+		<div class="title">
+			<div class="icon"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+			<div class="location">
+				<div class="region" *ngIf="selected_regional">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+				<div class="comuna" *ngIf="selected_comunal">Comuna de {{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+			</div>
+		</div>
+		<div class="data">
+			<!-- <div class="text">Último Periodo Actualizado:</div>		
+			<div class="text">Periodo Exigible: {{ lastPeriodo(ultimo_periodo) }}</div> -->
+			<button type="button" class="btn btn-success back" *ngIf="reports" (click)="backResumen()">Volver atrás</button>
+		</div>
+		<div class="cerrar"><i class="fa fa-times" aria-hidden="true" (click)="closeSemaforo()"></i></div>
+	</div>
+	<div class="body" *ngIf="!reports">
+		<div class="table_container">
+			<table class="semaforo_table">
+				<thead>
+					<tr><td class="space"></td><td colspan="14" class="anio">2017</td></tr>
+					<tr class="meses">
+						<td>INFORME</td>
+						<td title="Apertura Presupuestaria">APE</td>
+						<td title="Enero">ENE</td>
+						<td title="Febrero">FEB</td>
+						<td title="Marzo">MAR</td>
+						<td title="Abril">ABR</td>
+						<td title="Mayo">MAY</td>
+						<td title="Junio">JUN</td>
+						<td title="Julio">JUL</td>
+						<td title="Agosto">AGO</td>
+						<td title="Septiembre">SEP</td>
+						<td title="Octubre">OCT</td>
+						<td title="Noviembre">NOV</td>
+						<td title="Diciembre">DIC</td>
+						<td title="Cierre Contable">CIE</td>
+					</tr>
+				</thead>
+				<tbody class="tbody">
+					<tr *ngIf="evaluacion.length > 0">
+						<td><b>Evaluación Periodo</b></td>
+						<td *ngFor="let eval of evaluacion">
+							<div class="circle verde" *ngIf="eval && eval.ESTADOARCHIVO==100"><i class="fa fa-circle" aria-hidden="true"></i></div>
+							<div class="circle amarillo" *ngIf="eval && eval.ESTADOARCHIVO==50"><i class="fa fa-circle" aria-hidden="true"></i></div>
+							<div class="circle rojo" *ngIf="eval && eval.ESTADOARCHIVO==-100"><i class="fa fa-times-circle" aria-hidden="true"></i></div>
+						</td>
+					</tr>
+					<tr>
+						<td>Presupuestario</td>
+						<td *ngFor="let presu of presupuestario">
+							<div class="circle" *ngIf="presu.ESTADOARCHIVO==0"><i class="fa fa-minus" aria-hidden="true"></i></div>
+							<div class="circle verde clickable" (click)="showDetails(presu.reports)" *ngIf="presu && presu.ESTADOARCHIVO==1">
+								<i class="fa fa-check" aria-hidden="true" title="{{presu.reports.length}} Informes"></i>
+							</div>
+							<div class="circle rojo" *ngIf="presu && presu.ESTADOARCHIVO==-1"><i class="fa fa-times" aria-hidden="true"></i></div>
+						</td>
+					</tr>
+					<tr>
+						<td>Contable</td>
+						<td *ngFor="let cont of contable">
+							<div class="circle" *ngIf="cont.ESTADOARCHIVO==0"><i class="fa fa-minus" aria-hidden="true"></i></div>
+							<div class="circle verde clickable" (click)="showDetails(cont.reports)" *ngIf="cont && cont.ESTADOARCHIVO==1">
+								<i class="fa fa-check" aria-hidden="true" title="{{cont.reports.length}} Informes"></i>
+							</div>
+							<div class="circle rojo" *ngIf="cont && cont.ESTADOARCHIVO==-1"><i class="fa fa-times" aria-hidden="true"></i></div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="grafico" *ngIf="chart_data">
+			<div class="canvas">
+				<chart [type]="chart_type" [data]="chart_data" [options]="chart_data.getOptions()"></chart>
+			</div>
+		</div>
+		<div class="disclaimer">
+			<b>Notas:</b>
+			<p><b>APE:</b> Apertura Presupuestaria, corresponde al Presupuesto Inicial.<br>
+			<b>CIE:</b> Cierre Contable, corresponde al cierre de las cuentas de deudores y acreedores presupuestarios, y de gestión económica.</p>
+		</div>
+	</div>
+	<div class="body" *ngIf="reports">
+		<div class="table_container">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Nombre</th>
+						<th>Fecha límite envío</th>
+						<th>Fecha envío</th>
+						<th class="actions">Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let report of reports; let i = index">
+						<th scope="row">{{ i+1 }}</th>
+						<td>{{ report.INFORME }}</td>
+						<td *ngIf="report.FECHACORTE">{{ report.FECHACORTE }}</td>
+						<td *ngIf="!report.FECHACORTE"></td>
+						<td *ngIf="report.FECHACORTE && report.getFechaEnvio() > report.getFechaCorte()" class="after_deadline" title="Fuera de plazo">{{ report.FECHAENVIO }}</td>
+						<td *ngIf="report.getFechaEnvio() <= report.getFechaCorte() || !report.FECHACORTE">{{ report.FECHAENVIO }}</td>
+						<td class="details">
+							<a href="{{ report.URL }}" target="_blank">
+								<i class="fa fa-eye" aria-hidden="true" title="Ver informe"></i>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div class="logo"></div>
+<div class="control" *ngIf="!lock_status && poligonos_comunales.length > 0" (click)="backRegional()" @fade>
+	<div class="icon"><i class="fa fa-reply" aria-hidden="true"></i></div>
+	<div class="label">Vista Regional</div>
+</div>

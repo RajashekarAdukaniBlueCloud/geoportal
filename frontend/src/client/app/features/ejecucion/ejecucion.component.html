@@ -1,0 +1,224 @@
+<sd-navcomunas
+	[communes]="view_communes" 
+	[show]="!semaforo_view && view_communes.length > 0"
+	(setCommune)="setCommune($event)">
+</sd-navcomunas>
+<div class="leyenda_comunal" *ngIf="!semaforo_view" @fade>
+	<div class="head"><b>Estado de Informe Municipal</b></div>
+	<div class="body">
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box color1"></div>
+			</div>
+			<div class="info">
+				<div class="text">0% - 20% de ejecución</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box color2"></div>
+			</div>
+			<div class="info">
+				<div class="text">20% - 40% de ejecución</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box color3"></div>
+			</div>
+			<div class="info">
+				<div class="text">40% - 60% de ejecución</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box color4"></div>
+			</div>
+			<div class="info">
+				<div class="text">60% - 80% de ejecución</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box color5"></div>
+			</div>
+			<div class="info">
+				<div class="text">80% - 100% de ejecución</div>
+			</div>
+		</div>
+		<div class="row_leyenda">
+			<div class="color">
+				<div class="box color6"></div>
+			</div>
+			<div class="info">
+				<div class="text">> 100% de ejecución</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="leyenda_comunal" *ngIf="semaforo_view" @fade>
+	<div class="head"><b>Estado de Informe Municipal</b></div>
+	<div class="body">
+		<div class="row_leyenda_cumplimiento">
+			<div class="color">
+				<div class="box top"><i class="fa fa-check" aria-hidden="true"></i></div>
+			</div>
+			<div class="info">
+				<div class="text">Informe enviado a Contraloría</div>
+			</div>
+		</div>
+		<div class="row_leyenda_cumplimiento">
+			<div class="color">
+				<div class="box bottom"><i class="fa fa-times" aria-hidden="true"></i></div>
+			</div>
+			<div class="info">
+				<div class="text">Informe no enviado a Contraloría</div>
+			</div>
+		</div>
+		<div class="row_leyenda_cumplimiento">
+			<div class="color">
+				<div class="box"><i class="fa fa-minus" aria-hidden="true"></i></div>
+			</div>
+			<div class="info">
+				<div class="text">Informe no debe enviarse en el periodo</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="info_board">
+	<sd-cuadrogeneral [name]="name" [date]="date"></sd-cuadrogeneral>
+	<sd-cuadronacional 
+		[value]="(((ejecucion_por_nacional.PRESUPUESTO_ACT)?(ejecucion_por_nacional.EJECUCION/ejecucion_por_nacional.PRESUPUESTO_ACT*100):0) | number:'1.0-0') + '%'"
+		[leyend]="'Porcentaje de Ejecución'"
+	></sd-cuadronacional>
+	<div class="regional" *ngIf="selected_regional" @move>
+		<div class="title">
+			<div class="text">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ ((cumplimiento_regional[selected_regional.C_REG].PRESUPUESTO_ACT)?(cumplimiento_regional[selected_regional.C_REG].EJECUCION / (cumplimiento_regional[selected_regional.C_REG].PRESUPUESTO_ACT)*100):0) | number:'1.0-0'}}%</div>
+			<div class="text">Porcentaje de Ejecución</div>
+		</div>
+		<div class="arrow"><i class="fa fa-chevron-right" aria-hidden="true"></i></div>
+	</div>
+	<div class="comunal" *ngIf="selected_regional && selected_comunal" [class.semaforo_box]="semaforo_view" @move>
+		<div class="arrow"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+		<div class="title">
+			<div class="text">{{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ ((meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].PRESUPUESTO_ACT != 0)?(meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].EJECUCION/(meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].PRESUPUESTO_ACT))*100:0)  | number:'1.0-0'}}%</div>
+			<div class="text">Porcentaje de Ejecución</div>
+		</div>
+	</div>
+</div>
+<div class="presu_ejecucion" *ngIf="semaforo_view" @fade>
+	<div class="header">
+		<div class="title">
+			<div class="icon"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+			<div class="location">
+				<div class="region" *ngIf="selected_regional">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+				<div class="comuna" *ngIf="selected_comunal">Comuna de {{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+			</div>
+		</div>
+		<div class="data">
+			<!-- <div class="text">Informes Enviados: Enero - {{ lastPeriodo() }}</div>		
+			<div class="text">Millones de Pesos Chilenos</div> -->
+		</div>
+		<div class="cerrar"><i class="fa fa-times" aria-hidden="true" (click)="closeSemaforo()"></i></div>
+	</div>
+	<div class="body">
+		<div class="table_container">
+			<table class="semaforo_table">
+				<thead>
+					<tr><td colspan="5" class="gasto"><b>Gasto</b></td></tr>
+					<tr class="titulos">
+						<td>Presupuesto Inicial</td>
+						<td>Presupuesto Actualizado</td>
+						<td>Variación Presupuesto Actualizado vs. Inicial (%)</td>
+						<td>Ejecución</td>
+						<td>Ejecución (%)</td>
+					</tr>
+				</thead>
+				<tbody class="tbody">
+					<tr>
+						<td>MM$ {{ meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].PRESUPUESTO_INI | pointReplacer}}</td>
+						<td>MM$ {{ meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].PRESUPUESTO_ACT | pointReplacer}}</td>
+						<td>{{ meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].VARIACION_PRE | pointReplacer}}%</td>
+						<td>MM$ {{ meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].EJECUCION | pointReplacer}}</td>
+						<td>{{ meta_data_comunal[selected_regional.C_REG][selected_comunal.CINE_COM].EJECUCION_PERC | pointReplacer}}%</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="disclaimer">
+			<b>Notas:</b><br>
+			<p>
+				<b>a.</b> La información se presenta en valores brutos, es decir, sin eliminación de los flujos financieros producidos entre la Gestión Municipal y los Servicios Incorporados.<br>
+				<b>b.</b> Los valores informados excluyen el saldo final de caja.<br>
+				<b>c.</b> La ejecución se informa en base al gasto devengado.<br>
+				<b>d.</b> MM$ Millones de pesos chilenos.<br>
+			</p>
+		</div>
+		<div class="table_container">
+			<table class="semaforo_table">
+				<thead>
+					<tr><td class="space"></td><td colspan="14" class="anio">2017</td></tr>
+					<tr class="meses">
+						<td>INFORME</td>
+						<td>APE</td>
+						<td>ENE</td>
+						<td>FEB</td>
+						<td>MAR</td>
+						<td>ABR</td>
+						<td>MAY</td>
+						<td>JUN</td>
+						<td>JUL</td>
+						<td>AGO</td>
+						<td>SEP</td>
+						<td>OCT</td>
+						<td>NOV</td>
+						<td>DIC</td>
+						<td>CIE</td>
+					</tr>
+				</thead>
+				<tbody class="tbody">
+					<tr>
+						<td><b>Evaluación Periodo</b></td>
+						<td *ngFor="let eval of evaluacion">
+							<div class="circle verde" *ngIf="eval && eval.ESTADOARCHIVO==100"><i class="fa fa-circle" aria-hidden="true"></i></div>
+							<div class="circle amarillo" *ngIf="eval && eval.ESTADOARCHIVO==50"><i class="fa fa-circle" aria-hidden="true"></i></div>
+							<div class="circle rojo" *ngIf="eval && eval.ESTADOARCHIVO==-100"><i class="fa fa-times-circle" aria-hidden="true"></i></div>
+						</td>
+					</tr>
+					<tr>
+						<td>Presupuestario</td>
+						<td *ngFor="let presu of presupuestario">
+							<div class="circle" *ngIf="presu.ESTADOARCHIVO==0"><i class="fa fa-minus" aria-hidden="true"></i></div>
+							<div class="circle verde" *ngIf="presu && presu.ESTADOARCHIVO==1"><i class="fa fa-check" aria-hidden="true"></i></div>
+							<div class="circle rojo" *ngIf="presu && presu.ESTADOARCHIVO==-1"><i class="fa fa-times" aria-hidden="true"></i></div>
+						</td>
+					</tr>
+					<tr>
+						<td>Contable</td>
+						<td *ngFor="let cont of contable">
+							<div class="circle" *ngIf="cont.ESTADOARCHIVO==0"><i class="fa fa-minus" aria-hidden="true"></i></div>
+							<div class="circle verde" *ngIf="cont && cont.ESTADOARCHIVO==1"><i class="fa fa-check" aria-hidden="true"></i></div>
+							<div class="circle rojo" *ngIf="cont && cont.ESTADOARCHIVO==-1"><i class="fa fa-times" aria-hidden="true"></i></div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="disclaimer">
+			<b>Notas:</b>
+			<p><b>APE:</b> Apertura Presupuestaria, corresponde al Presupuesto Inicial.<br>
+			<b>CIE:</b> Cierre Contable, corresponde al cierre de las cuentas de deudores y acreedores presupuestarios, y de gestión económica.</p>
+		</div>
+	</div>
+</div>
+<div class="logo"></div>
+<div class="control" *ngIf="!semaforo_view && poligonos_comunales.length > 0" (click)="backRegional()" @fade>
+	<div class="icon"><i class="fa fa-reply" aria-hidden="true"></i></div>
+	<div class="label">Vista Regional</div>
+</div>

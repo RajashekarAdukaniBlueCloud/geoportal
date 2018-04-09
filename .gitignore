@@ -1,0 +1,7 @@
+.recommenders
+RemoteSystemsTempFiles
+.metadata
+geoportal
+geoportal_bkp
+.vscode
+.sonarlint

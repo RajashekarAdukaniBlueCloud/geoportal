@@ -1,0 +1,234 @@
+<sd-navcomunas
+	[communes]="view_communes"
+	[show]="!list_auditorias && view_communes.length > 0"
+	(setCommune)="setCommune($event)">
+</sd-navcomunas>
+<div class="leyenda" *ngIf="meta_data_regional && !meta_data_comunal" @fade>
+	<div class="head">Número de Observaciones</div>
+	<div class="body">
+		<div class="scale"></div>
+		<div class="fila">
+			<div class="top">+ {{ (hallazgosService.getMaxRegional()*0.7) | floor | pointReplacer }}</div>
+			<div class="middle">{{ (hallazgosService.getMaxRegional()*0.35)  | floor | pointReplacer }}</div>
+			<div class="bottom">0</div>
+		</div>
+	</div>
+</div>
+<div class="leyenda" *ngIf="meta_data_regional && meta_data_comunal && selected_regional && hallazgosService.getMaxComunal()" @fade>
+	<div class="head">Número de Observaciones</div>
+	<div class="body">
+		<div class="scale"></div>
+		<div class="fila">
+			<div class="top">+ {{ (hallazgosService.getMaxComunal()*0.7) | floor | pointReplacer}}</div>
+			<div class="middle">{{ (hallazgosService.getMaxComunal()*0.35)  | floor | pointReplacer }}</div>
+			<div class="bottom">0</div>
+		</div>
+	</div>
+</div>
+<!-- INFO BOARD -->
+<div class="info_board">
+	<sd-cuadrogeneral [name]="name" [date]="getDate()"></sd-cuadrogeneral>
+	<sd-cuadronacional 
+		[value]="((meta_data_regional)?hallazgosService.getTotalRegional():0) | pointReplacer"
+		[leyend]="'Observaciones'"
+	></sd-cuadronacional>
+	<div class="regional" *ngIf="selected_regional" @move>
+		<div class="title">
+			<div class="text">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ hallazgosService.getTotalRegional(selected_regional.C_REG) | pointReplacer }}</div>
+			<div class="text">Observaciones</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ hallazgosService.getTotalRegional(selected_regional.C_REG)/hallazgosService.getTotalRegional()*100 | floor }}%</div>
+			<div class="text">Del total Nacional</div>
+		</div>
+		<div class="arrow"><i class="fa fa-chevron-right" aria-hidden="true"></i></div>
+	</div>
+	<div class="comunal" *ngIf="selected_regional && selected_comunal" [class.semaforo_box]="auditoria_view" @move>
+		<div class="arrow"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+		<div class="title">
+			<div class="text">{{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ (meta_data_comunal.COMUNAS[selected_comunal.CINE_COM])?meta_data_comunal.COMUNAS[selected_comunal.CINE_COM].TOTAL_HALLAZGOS:0 | pointReplacer }}</div>
+			<div class="text">Observaciones</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ ((meta_data_comunal.COMUNAS[selected_comunal.CINE_COM])?meta_data_comunal.COMUNAS[selected_comunal.CINE_COM].TOTAL_HALLAZGOS:0)/ ((hallazgosService.getTotalComunal()) ? hallazgosService.getTotalComunal() : 1)*100 | floor }}%</div>
+			<div class="text">Del total Regional</div>
+		</div>
+	</div>
+</div>
+<!-- ELEMENTOS DE LOS INFORMES -->
+<div class="informes" *ngIf="list_auditorias" @fade>
+	<div class="header">
+		<div class="title">
+			<div class="icon"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+			<div class="location">
+				<div class="region" *ngIf="selected_regional">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+				<div class="comuna" *ngIf="selected_comunal">Comuna de {{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+			</div>
+		</div>
+		<div class="data">
+			<button type="button" class="btn btn-success back" *ngIf="list_observaciones && !current_observation" (click)="backResumen()">Volver atrás</button>
+			<button type="button" class="btn btn-success back" *ngIf="current_observation" (click)="backObservations()">Volver a Observaciones</button>
+		</div>
+		<div class="cerrar"><i class="fa fa-times" aria-hidden="true" (click)="closeInformes()"></i></div>
+	</div>
+	<div class="body" *ngIf="!list_observaciones">
+		<!-- <div class="search">
+			<div class="title">Buscar informe: </div>
+			<div class="buscador"><input type="text" placeholder="Nombre del informe" #buscadortxt name="buscador" (keyup)="buscador(buscadortxt.value)"/></div>
+		</div> -->
+		<div class="table_container">
+			<div class="grafico">
+				<div class="canvas">
+				<chart [type]="doughnutChartType" [data]="doughnut_data" [options]="doughnut_data.getOptions()" ></chart>
+				</div>
+			</div>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th colspan="9" style="text-align:center;">Número de Observaciones por Clasificación</th>
+					</tr>
+					<tr>
+						<th colspan="2"></th>
+						<th colspan="4" style="text-align:center; border: 1px;">Observaciones</th>
+						<th colspan="3"></th>
+					</tr>
+					<tr>
+						<th>Área</th>
+						<th>Total Informes</th>
+						<th>Altamente Complejas</th>
+						<th>Complejas</th>
+						<th>Medias</th>
+						<th>Leves</th>
+						<th>Total Observaciones</th>
+						<th>Observaciones Subsanadas</th>
+						<th>Promedio de observaciones por Informe</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let auditoria of list_auditorias | keysobj">
+						<td class="clickable" (click)="showDetails(auditoria)">{{ auditoria.key | capitalize }}</td>
+						<td> {{ auditoria.value.PRODUCTOS.length }}</td>
+						<td class="clickable" (click)="showDetails(auditoria, 'ALTAMENTE_COMPLEJA')"> {{ auditoria.value.ALTAS }} </td>
+						<td class="clickable" (click)="showDetails(auditoria, 'COMPLEJA')"> {{ auditoria.value.COMPLEJAS }} </td>
+						<td class="clickable" (click)="showDetails(auditoria, 'MEDIANAMENTE_COMPLEJA')"> {{ auditoria.value.MEDIAS }} </td>
+						<td class="clickable" (click)="showDetails(auditoria, 'LEVEMENTE_COMPLEJA')"> {{ auditoria.value.LEVES }} </td>
+						<td> {{ auditoria.value.TOTAL }} </td>
+						<td> {{ auditoria.value.SUBSANADAS }} </td>
+						<td> {{ auditoria.value.TOTAL/auditoria.value.PRODUCTOS.length | number : '1.2-2' }} </td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th>Total</th>
+						<th>{{ estadistica_total.PRODUCTOS.value }}</th>
+						<th>{{ estadistica_total.observaciones.ALTAS.value }}</th>
+						<th>{{ estadistica_total.observaciones.COMPLEJAS.value }}</th>
+						<th>{{ estadistica_total.observaciones.MEDIAS.value }}</th>
+						<th>{{ estadistica_total.observaciones.LEVES.value }}</th>
+						<th>{{ estadistica_total.TOTAL.value }}</th>
+						<th>{{ estadistica_total.SUBSANADAS.value }}</th>
+						<th>{{ estadistica_total.TOTAL.value/estadistica_total.PRODUCTOS.value | number : '1.2-2' }}</th>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+	<div class="body" *ngIf="paginator_observations && !current_observation">
+		<div class="table_container">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th colspan="9" style="text-align:center;">{{ list_observaciones[0].AREASERVICIO | capitalize }}</th>
+					</tr>
+					<tr>
+						<th>Informe</th>
+						<th>Nombre</th>
+						<th class="complejidad">Complejidad</th>
+						<th>Subsanada</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let observacion of paginator_observations">
+						<td>
+							<a href="{{ observacion.informe.FICHAINFORMEBIFA }}" target="_blank">
+								{{ observacion.informe.NUMEROINFORME }}/{{ observacion.informe.ANOINFORME }}
+							</a>
+						</td>
+						<td>{{ observacion.TITULOOBSERVACION }}</td>
+						<td>
+							<div class="circle {{observacion.COMPLEJIDADSERVICIO}}"></div>
+							{{ observacion.COMPLEJIDADSERVICIO | capitalize | removeUnderscore }}
+						</td>
+						<td class="subsanacion">
+							<i class="fa fa-check subsanada" aria-hidden="true" *ngIf="observacion.ESTADOSUBSANACION == 'SUBSANADA'" title="Subsanada"></i>
+							<i class="fa fa-times mantiene" aria-hidden="true" *ngIf="observacion.ESTADOSUBSANACION == 'MANTIENE'" title="No subsanada"></i>
+							<i class="fa fa-minus noaplica" aria-hidden="true" *ngIf="observacion.ESTADOSUBSANACION == undefined" title="No aplica seguimiento"></i>
+						</td>
+						<td (click)="showObservation(observacion)" class="clickable center"><i class="fa fa-eye" aria-hidden="true" title="Ver informe"></i></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="footer">
+				<div class="resumen">Mostrando registros del {{ ((actual_page-1))*pagination_config+1 }} al {{ (actual_page*pagination_config < pool_observations.length)?actual_page*pagination_config:(pool_observations.length) }} de {{ pool_observations.length }}</div>
+				<div class="paginator">
+					<div class="arrow" (click)="paginator(((actual_page-1)>1) ? actual_page-1 : 1)"><i class="fa fa-angle-double-left" aria-hidden="true"></i></div>
+					<div class="page" *ngFor="let page of pages" (click)="paginator(page)" [class.active]="page==actual_page">{{ page }}</div>
+					<div class="arrow" (click)="paginator(((actual_page+1)<pages.length) ? actual_page+1 : pages.length)"><i class="fa fa-angle-double-right" aria-hidden="true"></i></div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	<div class="body" *ngIf="current_observation">
+		<div class="table_container table_observation">
+			<table class="table">
+				<tbody>
+					<tr>
+						<th scope="row">Nombre:</th>
+						<td>{{ current_observation.TITULOOBSERVACION }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Descripción:</th>
+						<td>{{ current_observation.DESCOBSERVACION }}</td>
+					</tr>
+					<tr *ngIf="current_observation.ACCIONCORRECTIVA">
+						<th scope="row">Acción correctiva:</th>
+						<td>{{ current_observation.ACCIONCORRECTIVA }}</td>
+					</tr>
+					<tr *ngIf="current_observation.REQUIERESEGUIMIENTO === 'SI' && current_observation.ESTADOSUBSANACION">
+						<th scope="row">Subsanada:</th>
+						<td>{{ current_observation.ESTADOSUBSANACION == 'SUBSANADA' ? 'Si' : 'No' }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Informe SICA</th>
+						<td>
+							<a href="{{ current_observation.informe.FICHAINFORMEBIFA }}" target="_blank">
+								{{ current_observation.informe.FICHAINFORMEBIFA }}
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Informe PDF</th>
+						<td>
+							<a href="{{ current_observation.informe.PDFINFORME }}" target="_blank">
+								{{ current_observation.informe.PDFINFORME.substring(0, 90) }}...
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div class="control" *ngIf="!list_auditorias && poligonos_comunales.length > 0" (click)="backRegional()" @fade>
+	<div class="icon"><i class="fa fa-reply" aria-hidden="true"></i></div>
+	<div class="label">Vista Regional</div>
+</div>
+<div class="logo"></div>

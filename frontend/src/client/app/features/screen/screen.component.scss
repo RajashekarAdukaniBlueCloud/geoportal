@@ -1,0 +1,84 @@
+:host{
+  height:100%;
+  width:100%;
+  position:absolute;
+}
+.screen{
+  position:absolute;
+  height:100%;
+  width:100%;
+  background: url("assets/img/back.jpg");
+  z-index: 9999;
+  .band{
+    background: rgba(255,255,255,0.9);
+    height:200px;
+    display: flex;
+    align-items:center;
+    align-content:center;
+    justify-content:center;
+    .logo{
+      display:flex;
+      height:90px;
+      width:200px;
+      background: url("assets/img/LOGO-90.svg");
+      background-repeat: no-repeat;
+      margin-right:50px;
+    }
+    .geoportal{
+      width:200px;
+      height:110px;
+      display:flex;
+      flex-direction:column;
+      .title{
+        height:30px;
+      }
+      .circle{
+        display:flex;
+        font-size:4rem;
+        border: 1px solid #333;
+        border-radius: 100%;
+        height:80px;
+        width:80px;
+        justify-content:center;
+        align-content:center;
+        align-items:center;
+      }
+    }
+  }
+  .layers{
+    height: 200px;
+    width:100%;
+    display:flex;
+    margin-top:300px;
+    flex-direction:row;
+    justify-content:center;
+    align-content:center;
+    align-items:center;
+    background: rgba(0,0,0,0.5);
+    .layer{
+      display:flex;
+      flex-direction:column;
+      color: white;
+      justify-content:center;
+      margin-right:40px;
+      align-items:center;
+      .title{
+        display:flex;
+        justify-content:center;
+        margin-bottom:20px;
+      }
+      .icon{
+        display:flex;
+        height:100px;
+        width:100px;
+        border-radius:100%;
+        border: 1px solid #FFF;
+        font-size:3.5rem;
+        justify-content:center;
+        align-content:center;
+        align-items:center;
+        cursor:pointer;
+      }
+    }
+  }
+}

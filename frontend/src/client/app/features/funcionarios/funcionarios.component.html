@@ -1,0 +1,250 @@
+<sd-navcomunas
+	[communes]="view_communes"
+	[show]="!comuna_view && view_communes.length > 0"
+	(setCommune)="setCommune($event)">
+</sd-navcomunas>
+<div class="leyenda" *ngIf="!comuna_view &&!meta_data_comunal && funcionarios.getMaxNacional()" @fade>
+	<div class="head">Número de Servidores</div>
+	<div class="body">
+		<div class="scale"></div>
+		<div class="fila">
+			<div class="top">+ {{ (funcionarios.getMaxNacional()*0.7) | floor | pointReplacer }}</div>
+			<div class="middle">{{ (funcionarios.getMaxNacional()*0.35)  | floor | pointReplacer }}</div>
+			<div class="bottom">0</div>
+		</div>
+	</div>
+</div>
+<div class="leyenda" *ngIf="!comuna_view && meta_data_comunal && selected_regional && funcionarios.getMaxRegional(selected_regional.C_REG)" @fade>
+	<div class="head">Número de Servidores</div>
+	<div class="body">
+		<div class="scale"></div>
+		<div class="fila">
+			<div class="top">+ {{ (funcionarios.getMaxRegional(selected_regional.C_REG)*0.7) | floor | pointReplacer}}</div>
+			<div class="middle">{{ (funcionarios.getMaxRegional(selected_regional.C_REG)*0.35)  | floor | pointReplacer }}</div>
+			<div class="bottom">0</div>
+		</div>
+	</div>
+</div>
+<!-- INFO BOARD -->
+<div class="info_board">
+	<sd-cuadrogeneral [name]="name" [date]="date"></sd-cuadrogeneral>
+	<sd-cuadronacional 
+		[value]="funcionarios.getTotalNacional() | pointReplacer"
+		[leyend]="'Servidores Públicos'"
+	></sd-cuadronacional>
+	<div class="regional" *ngIf="selected_regional" @move>
+		<div class="title">
+			<div class="text">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ funcionarios.getTotalRegional(selected_regional.C_REG) | pointReplacer }}</div>
+			<div class="text">Servidores Públicos</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ funcionarios.getTotalRegional(selected_regional.C_REG)/funcionarios.getTotalNacional()*100 | number:'1.0-0'}}%</div>
+			<div class="text">Del total Nacional</div>
+		</div>
+		<div class="arrow"><i class="fa fa-chevron-right" aria-hidden="true"></i></div>
+	</div>
+	<div class="comunal" *ngIf="selected_regional && selected_comunal" [class.active_box]="comuna_view" @move>
+		<div class="arrow"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+		<div class="title">
+			<div class="text">{{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ meta_data_comunal.get(parseInt(selected_comunal.CINE_COM)).TOTAL | pointReplacer }}</div>
+			<div class="text" >Servidores Públicos</div>
+		</div>
+		<div class="info">
+			<div class="value">{{ meta_data_comunal.get(parseInt(selected_comunal.CINE_COM)).TOTAL/funcionarios.getTotalRegional(parseInt(selected_regional.C_REG))*100 | number:'1.0-0' }}%</div>
+			<div class="text">Del total Regional</div>
+		</div>
+	</div>
+</div>
+<!-- ELEMENTOS DE LOS INFORMES -->
+<div class="informes" *ngIf="comuna_view">
+	<div class="header">
+		<div class="title">
+			<div class="icon"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+			<div class="location">
+				<div class="region" *ngIf="selected_regional">{{ ((selected_regional != null)?selected_regional.REGION:'') | grammarchecker | capitalize  }}</div>
+				<div class="comuna" *ngIf="selected_comunal">Comuna de {{ ((selected_comunal != null)?selected_comunal.COMUNA:'') | grammarchecker | capitalize }}</div>
+			</div>
+			<div class="funcionarios" *ngIf="comuna_view.total">
+				<div class="title_f">Total de funcionarios únicos</div>
+				<div class="numero">{{ meta_data_comunal.get(parseInt(selected_comunal.CINE_COM)).TOTAL | pointReplacer }} Servidores Públicos</div>
+			</div>
+		</div>
+		<div class="data">
+			<button type="button" class="btn btn-success back" *ngIf="comuna_detail && !view_servidores && !view_contratos_run" (click)="backResumen()">Volver atrás</button>
+			<button type="button" class="btn btn-success back" *ngIf="comuna_detail && view_servidores && view_contratos_run" (click)="backServidores()">Volver atrás</button>
+			<button type="button" class="btn btn-success back" *ngIf="view_servidores && !view_contratos_run" (click)="backAreas()">Volver atrás</button>
+		</div>
+		<div class="cerrar"><i class="fa fa-times" aria-hidden="true" (click)="closeInformes()"></i></div>
+	</div>
+	<div class="body" *ngIf="comuna_view && !comuna_detail && !view_servidores && !view_contratos_run">
+		<div class="grafico">
+			<div class="canvas">
+				<chart [type]="doughnutChartType" [data]="doughnut_data_comuna" [options]="doughnut_data_comuna.getOptions()"></chart>
+			</div>
+		</div>
+		<div class="tabla">
+			<table class="table table-striped">
+			  <thead>
+			    <tr>
+			      <th>#</th>
+			      <th>Tipo de Contratación</th>
+			      <th>Total</th>
+			      <th class="acciones">Acciones</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+				<tr *ngFor="let contractType of comuna_view; let i = index">
+					<th scope="row">{{ i+1 }}</th>
+					<td>{{ contractType.TIPOCALIDAD | grammarchecker | capitalize }}</td>
+					<td>{{ contractType.TOTAL | pointReplacer }}</td>
+					<td (click)="detailComunal(contractType)" class="detalles">
+						<i class="fa fa-external-link-square" aria-hidden="true" title="Ver detalles"></i>
+					</td>
+				</tr>
+			  </tbody>
+			</table>
+		</div>
+		<div class="disclaimer">
+			<b>Notas:</b><br>
+			<b>Planta Titular: </b>Funcionarios que se nombran para ocupar en propiedad un cargo vacante de la planta de personal de la municipalidad.<br>
+			<b>Contrata: </b>Funcionarios designados en un empleo de carácter transitorio y forman parte de la dotación de una municipalidad.<br>
+			<b>Honorarios: </b>Profesionales, técnicos o expertos contratados sobre la base de honorarios para desempeñar labores accidentales y que no sean las habituales del servicio, o cometidos específicos.<br>
+			<b>Código del trabajo: </b>Funcionarios contratados bajo las normas del Código del Trabajo, ya sea por un plazo fijo o indefinido.<br>
+		</div>
+	</div>
+	<div class="bodydetail" *ngIf="comuna_view && comuna_detail && !view_servidores && !view_contratos_run">
+		<div class="grafico">
+			<div class="canvas">
+				<chart [type]="doughnutChartType" [data]="doughnut_data_detail_comuna" [options]="doughnut_data_detail_comuna.getOptions()" ></chart>
+			</div>
+		</div>
+		<div class="tabla">
+			<div class="table_resumen">
+				<div class="head_resumen">
+					<div class="colapse"></div>
+					<div class="index">#</div>
+					<div class="index"></div>
+					<div class="title">Tipo de Contratación</div>
+					<div class="color">Color</div>
+					<div class="total">Total</div>
+				</div>
+				<div class="body_resumen">
+					<div class="body_resumen_item" *ngFor="let area of comuna_detail; let i = index" #resumen_item>
+						<div class="body_resumen_item_group" (click)="resumen_item.view = !resumen_item.view">
+							<div class="colapse">
+								<i class="fa fa-angle-down" *ngIf="resumen_item.view"></i> 
+								<i class="fa fa-angle-right" *ngIf="!resumen_item.view"></i>
+							</div>
+							<div class="index">{{ i+1 }}</div>
+							<div class="index"></div>
+							<div class="title">{{ area.AREA | grammarchecker | capitalize }}</div>
+							<div class="color"><div class="color" [style.background-color]="doughnut_data_detail_comuna.getColorById(i)"></div></div>
+							<div class="total">{{ area.TOTAL | pointReplacer }}</div>
+						</div>
+						<div class="body_resumen_item_detail" *ngIf="resumen_item.view">
+							<div class="item" *ngFor="let calidad of area.CALIDADES; let j = index" @move>
+								<div class="index"></div>
+								<div class="index">{{ i+1 }}.{{ j+1 }}</div>
+								<div class="title">{{ calidad.CALIDAD | grammarchecker | capitalize }}</div>
+								<div class="color"><div class="color" [style.background-color]="doughnut_data_detail_comuna.getColorById(i)"></div></div>
+								<div class="totalitem">{{ calidad.TOTAL | pointReplacer }}</div>
+								<div class="action" (click)="showFuncionarios(area, calidad)"><i class="fa fa-external-link-square" aria-hidden="true"></i></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="body" *ngIf="comuna_view && comuna_detail && view_servidores && !view_contratos_run">
+		<div class="tabla_servidores">
+			<table class="table table-striped">
+			  <thead>
+			    <tr>
+			      <th>#</th>
+			      <th>Run</th>
+				  <th>Nombre</th>
+				  <th>Calidad</th>
+				  <th class="acciones">Acciones</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+					<tr *ngFor="let servidor of paginator_servidores; let i = index">
+						<th scope="row">{{ (pagination_config*(actual_page-1))+(i+1) }}</th>
+						<td>{{ servidor.RUN | run }}</td>
+						<td>{{ servidor.NOMBRE | capitalize }}</td>
+						<td>{{ servidor.CALIDAD | grammarchecker | capitalize }}</td>
+						<td (click)="getContratosRun(servidor)" class="detalles">
+							<i class="fa fa-external-link-square" aria-hidden="true" title="Ver detalles"></i>
+						</td>
+					</tr>
+			  </tbody>
+			</table>
+			<div class="footer">
+				<div class="resumen">Mostrando registros del {{ ((actual_page-1))*pagination_config+1 }} al {{ (actual_page*pagination_config < view_servidores.length)?actual_page*pagination_config:(view_servidores.length) }} de {{ view_servidores.length }}</div>
+				<div class="paginator">
+					<div class="arrow" (click)="paginator((actual_page-1>1)?actual_page-1:1)"><i class="fa fa-angle-double-left" aria-hidden="true"></i></div>
+					<div class="page" *ngFor="let page of view_pages" (click)="paginator(page)" [class.active]="page==actual_page">{{ page }}</div>
+					<div class="arrow" (click)="paginator((actual_page+1<pages.length)?actual_page+1:pages.length)"><i class="fa fa-angle-double-right" aria-hidden="true"></i></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="body" *ngIf="comuna_view && comuna_detail && view_servidores && view_contratos_run">
+		<div class="tabla_contratos_run">
+			<div class="datos_personales">
+				<div class="datos" (click)="tab.visible = !tab.visible">
+					<div class="item">Datos del Servidor Público</div>
+				</div>
+				<div class="body">
+					<div class="item name"><b>Nombre:&nbsp;</b> {{ servidor_name | capitalize }}</div>
+					<div class="item run"><b>RUN:&nbsp;</b> {{ servidor_run | run }}</div>
+				</div>
+			</div>
+			<div class="tipo_contrato" *ngFor="let key of view_contratos_run_agrupado | keys" #tab>
+				<div class="calidad" (click)="tab.visible = !tab.visible">
+					<div class="item">{{ view_contratos_run_agrupado[key][0].CALIDAD | grammarchecker | capitalize }}</div>
+					<i class="fa fa-angle-down" *ngIf="tab.visible"></i>
+					<i class="fa fa-angle-right" *ngIf="!tab.visible"></i>
+				</div>
+				<table class="table table-striped" *ngIf="tab.visible" @drop>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Área</th>
+							<th>Cargo</th>
+							<th>Grado</th>
+							<th>Planta</th>
+							<th>Remuneración</th>
+							<th>Fecha desde</th>
+							<th>Fecha hasta</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let contrato of view_contratos_run_agrupado[key]; let i = index">
+							<th scope="row">{{ i+1 }}</th>
+							<td>{{ contrato.AREA | grammarchecker | capitalize }}</td>
+							<td>{{ contrato.CARGO | grammarchecker | capitalize }}</td>
+							<td>{{ contrato.GRADO }}</td>
+							<td>{{ contrato.PLANTA | grammarchecker | capitalize }}</td>
+							<td>{{ contrato.REMUNERACION | grammarchecker | capitalize }}</td>
+							<td>{{ contrato.FECHADESDE | datetext }}</td>
+							<td>{{ contrato.FECHAHASTA | datetext }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="control" *ngIf="!comuna_view && poligonos_comunales && poligonos_comunales.length > 0" (click)="backRegional()" @fade>
+	<div class="icon"><i class="fa fa-reply" aria-hidden="true"></i></div>
+	<div class="label">Vista Regional</div>
+</div>
+<div class="logo"></div>
